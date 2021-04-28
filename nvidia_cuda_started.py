@@ -7,28 +7,15 @@ Original file is located at
     https://colab.research.google.com/drive/1m52SdFmfglke_MM7f9uXBKc3uLAd_BV1
 """
 
-!nvidia-smi
-
 import numpy as np
 from numba import cuda
+from timeit import default_timer as timer   
 
 @cuda.jit
 def multiply_by_2(array):
     pos = cuda.grid(1)
     array[pos] = array[pos] * 2
 
-an_array = np.arange(1000)
-
-threadsperblock = 32
-blockspergrid = (an_array.size + (threadsperblock - 1)) // threadsperblock
-multiply_by_2[blockspergrid, threadsperblock](an_array)
-
-print(an_array)
-
-import numba
-import numpy as np
-
-from timeit import default_timer as timer   
 
 def normal_function(array):
     k = array
@@ -57,3 +44,11 @@ if __name__=="__main__":
     start = timer(np.ones(n, dtype = np.float64))
     using_gpu(a)
     print("Using GPU:", timer()-start)
+    
+    an_array = np.arange(1000)
+
+    threadsperblock = 32
+    blockspergrid = (an_array.size + (threadsperblock - 1)) // threadsperblock
+    multiply_by_2[blockspergrid, threadsperblock](an_array)
+
+    print(an_array)
